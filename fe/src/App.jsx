@@ -26,6 +26,8 @@ export default function App() {
   const [risultati, setRisultati] = useState(null)
   const [categoria, setCategoria] = useState(null)
   const [mostraNuova, setMostraNuova] = useState(false)
+  // null = nessun modale; 'login' o 'registrazione' = quale dei due mostrare.
+  const [accesso, setAccesso] = useState(null)
 
   const isAdmin = utente?.ruolo === 'ADMIN'
 
@@ -71,6 +73,14 @@ export default function App() {
     setProdotti(await api.prodotti())
     setRisultati(null)
     setSelezionato(null)
+    setAccesso(null)
+  }
+
+  // Registrazione: creato l'account, il login parte subito. Chi si e' appena iscritto
+  // non deve ridigitare email e password che ha scritto due secondi fa.
+  async function faiRegistrazione(nome, email, password) {
+    await api.registra(nome, email, password)
+    await faiLogin(email, password)
   }
 
   async function logout() {
@@ -122,7 +132,7 @@ export default function App() {
               ➕ Aggiungi pianta
             </button>
           )}
-          <BarraUtente utente={utente} onLogin={faiLogin} onLogout={logout} />
+          <BarraUtente utente={utente} onApriAccesso={setAccesso} onLogout={logout} />
         </div>
       </header>
 
@@ -194,6 +204,16 @@ export default function App() {
           categorie={categorie}
           onCrea={creaPianta}
           onChiudi={() => setMostraNuova(false)}
+        />
+      )}
+
+      {accesso && (
+        <ModaleAccesso
+          modo={accesso}
+          onLogin={faiLogin}
+          onRegistra={faiRegistrazione}
+          onCambiaModo={setAccesso}
+          onChiudi={() => setAccesso(null)}
         />
       )}
 
@@ -443,20 +463,7 @@ function ModaleNuovaPianta({ categorie, onCrea, onChiudi }) {
   )
 }
 
-function BarraUtente({ utente, onLogin, onLogout }) {
-  const [errore, setErrore] = useState(null)
-  const [mostraFormAdmin, setMostraFormAdmin] = useState(false)
-  const [passwordAdmin, setPasswordAdmin] = useState('')
-
-  async function login(email, password) {
-    setErrore(null)
-    try {
-      await onLogin(email, password)
-    } catch (e) {
-      setErrore(e.message)
-    }
-  }
-
+function BarraUtente({ utente, onApriAccesso, onLogout }) {
   if (utente) {
     return (
       <div className="barra-utente">
@@ -471,43 +478,117 @@ function BarraUtente({ utente, onLogin, onLogout }) {
     )
   }
 
+  // Un solo modo di entrare, uguale per tutti: email e password. Anche l'amministratore
+  // passa di qui, con admin@demo.it e la password scelta al momento del deploy.
   return (
     <div className="barra-utente">
-      <span className="anonimo">Anonimo</span>
+      <button onClick={() => onApriAccesso('login')}>Accedi</button>
+      <button className="primario" onClick={() => onApriAccesso('registrazione')}>
+        Registrati
+      </button>
+    </div>
+  )
+}
 
-      {/* L'utente normale e' un account dimostrativo: la sua password e' pubblica per
-          costruzione, serve solo a far vedere il livello 3 (ognuno vede i propri preferiti).
-          Tenerla qui non espone niente che non sia gia' scritto nel README. */}
-      <button onClick={() => login('user@demo.it', 'useruser12')}>Entra come USER</button>
+/**
+ * Un solo modale per accesso e registrazione: cambiano i campi e l'endpoint, non il resto.
+ * Dopo una registrazione riuscita fa subito il login, cosi' chi si iscrive non deve
+ * ridigitare quello che ha appena scritto.
+ */
+function ModaleAccesso({ modo, onLogin, onRegistra, onCambiaModo, onChiudi }) {
+  const registrazione = modo === 'registrazione'
+  const [nome, setNome] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [errore, setErrore] = useState(null)
+  const [inCorso, setInCorso] = useState(false)
 
-      {/* L'admin no: la sua password e' ADMIN_PASSWORD, scelta al momento del deploy e
-          diversa su ogni installazione. Scriverla qui significherebbe pubblicarla, visto
-          che il bundle del frontend e' scaricabile da chiunque apra il sito. Si digita. */}
-      {mostraFormAdmin ? (
-        <form
-          className="login-admin"
-          onSubmit={(e) => {
-            e.preventDefault()
-            login('admin@demo.it', passwordAdmin)
-          }}
-        >
-          <input
-            type="password"
-            value={passwordAdmin}
-            onChange={(e) => setPasswordAdmin(e.target.value)}
-            placeholder="Password admin"
-            autoFocus
-          />
-          <button type="submit">Entra</button>
-          <button type="button" className="annulla" onClick={() => setMostraFormAdmin(false)}>
-            Annulla
+  async function invia(e) {
+    e.preventDefault()
+    setErrore(null)
+    setInCorso(true)
+    try {
+      if (registrazione) await onRegistra(nome, email, password)
+      else await onLogin(email, password)
+      // Riuscito: il modale lo chiude il chiamante, che ha appena cambiato stato.
+    } catch (err) {
+      setErrore(err.message)
+      setInCorso(false)
+    }
+  }
+
+  return (
+    <div className="modal-overlay" onClick={onChiudi}>
+      <div className="modal stretto" onClick={(e) => e.stopPropagation()}>
+        <button className="chiudi" onClick={onChiudi}>
+          ×
+        </button>
+
+        <h2 className="titolo-accesso">
+          {registrazione ? 'Crea il tuo account' : 'Accedi al tuo account'}
+        </h2>
+        <p className="sottotitolo-accesso">
+          {registrazione
+            ? 'Ti serve per salvare le piante nel tuo giardino.'
+            : 'Entra per ritrovare il tuo giardino.'}
+        </p>
+
+        <form className="form-accesso" onSubmit={invia}>
+          {registrazione && (
+            <label>
+              Nome
+              <input
+                type="text"
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
+                autoComplete="name"
+                required
+                autoFocus
+              />
+            </label>
+          )}
+
+          <label>
+            Email
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
+              required
+              autoFocus={!registrazione}
+            />
+          </label>
+
+          <label>
+            Password
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete={registrazione ? 'new-password' : 'current-password'}
+              // Lo stesso minimo che il server impone con @Size(min = 8): cosi' l'errore
+              // arriva subito, senza un giro di rete per sentirsi dire una cosa nota.
+              minLength={registrazione ? 8 : undefined}
+              required
+            />
+            {registrazione && <span className="aiuto">Almeno 8 caratteri.</span>}
+          </label>
+
+          {errore && <p className="errore">⚠️ {errore}</p>}
+
+          <button type="submit" className="primario largo" disabled={inCorso}>
+            {inCorso ? 'Un attimo...' : registrazione ? 'Crea account' : 'Accedi'}
           </button>
         </form>
-      ) : (
-        <button onClick={() => setMostraFormAdmin(true)}>Entra come ADMIN</button>
-      )}
 
-      {errore && <span className="errore">⚠️ {errore}</span>}
+        <p className="cambia-modo">
+          {registrazione ? 'Hai gia un account?' : 'Non hai ancora un account?'}{' '}
+          <button className="link" onClick={() => onCambiaModo(registrazione ? 'login' : 'registrazione')}>
+            {registrazione ? 'Accedi' : 'Registrati'}
+          </button>
+        </p>
+      </div>
     </div>
   )
 }

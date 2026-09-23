@@ -65,11 +65,19 @@ Tre punti dove i due pezzi si incontrano:
 3. http://localhost:5173 — in sviluppo il proxy di Vite inoltra `/api` alla 8080,
    quindi `VITE_API_URL` resta vuota.
 
-Utenti creati al primo avvio: `admin@demo.it`, `user@demo.it`, `altro@demo.it`.
-Gli utenti normali entrano con un pulsante (password `useruser12`, dimostrativa); per l'admin
-si digita `ADMIN_PASSWORD`, che non puo' stare nel codice perche' il bundle del frontend e'
-scaricabile da chiunque. Il seeder la riallinea a ogni avvio: per cambiarla basta
+### Accesso
+
+Chi visita il sito si registra da sé con **Registrati** (nome, email, password da almeno
+8 caratteri). Il ruolo lo assegna il server, sempre `USER`: non è un campo che il client
+possa mandare, altrimenti basterebbe aggiungere `"ruolo": "ADMIN"` alla richiesta.
+
+L'amministratore entra dallo **stesso** form, con `admin@demo.it` e il valore di
+`ADMIN_PASSWORD`. Quella password non sta nel codice: il bundle del frontend è scaricabile
+da chiunque apra il sito. Il seeder la riallinea a ogni avvio, quindi per cambiarla basta
 modificare la variabile e rilanciare il servizio.
+
+Il seeder crea anche `user@demo.it` e `altro@demo.it` (password `useruser12`), utili in
+locale per vedere che due utenti diversi hanno giardini diversi.
 
 ## Deploy su Render
 

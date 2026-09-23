@@ -31,8 +31,14 @@ async function richiesta(percorso, { method = 'GET', body, auth = false } = {}) 
   const testo = await res.text()
   const dati = testo ? JSON.parse(testo) : null
   if (!res.ok) {
-    const messaggio = dati?.messaggio || `Errore ${res.status}`
-    throw new Error(messaggio)
+    // Sugli errori di validazione il server manda un messaggio generico ("Payload non
+    // valido") e il motivo vero in dettagli: "password: deve avere almeno 8 caratteri".
+    // Senza questa riga l'utente leggerebbe solo il generico e non saprebbe cosa correggere.
+    const dettagli = dati?.dettagli
+    if (Array.isArray(dettagli) && dettagli.length > 0) {
+      throw new Error(dettagli.join(' · '))
+    }
+    throw new Error(dati?.messaggio || `Errore ${res.status}`)
   }
   return dati
 }
@@ -43,6 +49,12 @@ export const api = {
 
   login: (email, password) =>
     richiesta('/api/auth/login', { method: 'POST', body: { email, password } }),
+
+  // Registrazione aperta a chiunque: il ruolo lo decide il server, che assegna sempre
+  // USER. Non e' un campo che il client possa mandare, altrimenti bastarebbe aggiungere
+  // "ruolo": "ADMIN" alla richiesta per diventare amministratori.
+  registra: (nome, email, password) =>
+    richiesta('/api/auth/register', { method: 'POST', body: { nome, email, password } }),
 
   // Il catalogo e' autenticato in modo OPZIONALE: se sono loggata mando il token (auth:true) e
   // il server puo' darmi la vista admin; se non lo sono, ricevo quella pubblica. Stesso indirizzo.
