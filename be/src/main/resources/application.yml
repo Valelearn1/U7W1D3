@@ -1,0 +1,72 @@
+# Un solo file per locale e Render. Ogni valore ha la forma ${VARIABILE:ripiego}:
+# su Render arriva la variabile, in aula resta il ripiego. Nessun segreto vero qui dentro.
+
+server:
+  # Render assegna la porta a runtime e la comunica con PORT. In locale non c'e': 8080,
+  # che e' anche la porta verso cui punta il proxy di Vite in fe/vite.config.js.
+  port: ${PORT:8080}
+
+spring:
+  application:
+    name: radici
+
+  datasource:
+    # DB_URL / DB_USERNAME / DB_PASSWORD le scrive DatabaseUrl.applica() partendo da
+    # DATABASE_URL quando l'app gira su Render. In locale valgono i ripieghi qui sotto.
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/U7W1D2}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      # Le tabelle le crea Hibernate al primo avvio: su Render nessuno lancia CREATE TABLE a mano.
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        # Render interroga /actuator/health per capire se il servizio e' sano.
+        # Senza questo endpoint il deploy non arriva mai a "live".
+        include: health
+
+app:
+  jwt:
+    # Su Render la genera il blueprint (generateValue: true). Il ripiego serve solo in aula.
+    secret: ${JWT_SECRET:chiave-di-sviluppo-lunga-almeno-32-caratteri-non-usare-online}
+
+  admin:
+    # Password del primo amministratore creato dal seeder. Su Render si imposta a mano
+    # (sync: false): e' la credenziale con cui si entra nel sito pubblicato.
+    password: ${ADMIN_PASSWORD:adminadmin}
+
+  cors:
+    # UNA sola variabile per il CORS, la stessa che compare in render.yaml.
+    # In locale e' il server di sviluppo di Vite; su Render l'indirizzo del frontend.
+    allowed-origin: ${ALLOWED_ORIGIN:http://localhost:5173}
+
+  # ============================================================
+  #  INTERRUTTORI DELLE VULNERABILITA'
+  # ============================================================
+  # Ogni flag accende la versione VULNERABILE di un pezzo di codice; la versione sicura e'
+  # scritta accanto, nello stesso metodo, cosi' si confrontano a colpo d'occhio.
+  #
+  #   true  -> l'app e' il bersaglio: gli agenti devono TROVARE il problema
+  #   false -> l'app e' corretta:     gli agenti devono passare puliti
+  #
+  # Sul sito pubblicato restano tutti a false: online gira la versione difesa.
+  # Per rifare la fase "attacco" in locale si rimettono a true e si rilanciano gli agenti.
+  vulnerable:
+    sqli: false
+    xss: false
+    csrf: false
+    idor: false
+
+  audit:
+    # Cartella dove gli agenti di sicurezza scrivono i loro report.
+    output-dir: ../reports

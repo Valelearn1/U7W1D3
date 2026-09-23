@@ -128,14 +128,21 @@ public class AuthFilter extends OncePerRequestFilter {
 
     /**
      * Rotte del tutto pubbliche, che il filtro salta completamente: login/registrazione
-     * (non possono richiedere un token, altrimenti non ci si registra mai) e /error.
+     * (non possono richiedere un token, altrimenti non ci si registra mai), /error e
+     * l'health check.
      * La vetrina NON e' qui: passa dal filtro perche' il token, se presente, va letto
      * comunque (autenticazione opzionale, vedi sopra).
+     *
+     * /actuator/** e' l'indirizzo che Render interroga per sapere se il servizio e' sano,
+     * e lo interroga senza token. Se il filtro lo trattasse come una rotta protetta
+     * risponderebbe 401, Render non vedrebbe mai il servizio partire e il deploy resterebbe
+     * appeso finche' non scade.
      */
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getServletPath();
         return MATCHER.match("/api/auth/**", path)
+                || MATCHER.match("/actuator/**", path)
                 || MATCHER.match("/error", path);
     }
 }

@@ -3,12 +3,12 @@
 # BE in background, FE in primo piano: Ctrl+C chiude entrambi.
 cd "$(dirname "$0")" || exit 1
 
-# ---------- PostgreSQL: serve il database progetto_base sulla 5432 ----------
+# ---------- PostgreSQL: serve il database U7W1D2 sulla 5432 ----------
 if nc -z localhost 5432 >/dev/null 2>&1; then
   echo "[postgres] in ascolto sulla 5432."
 else
   echo "[postgres] porta 5432 chiusa: il backend non partira'."
-  echo "           createdb -U postgres progetto_base"
+  echo "           createdb -U postgres U7W1D2"
 fi
 
 # Dipendenze FE solo al primo avvio
@@ -24,7 +24,7 @@ trap 'kill 0 2>/dev/null' EXIT
 
 echo
 echo " Applicazione : http://localhost:5173"
-echo " Stato        : http://localhost:8080/api/stato"
+echo " Catalogo     : http://localhost:8080/api/prodotti"
 echo " Salute       : http://localhost:8080/actuator/health"
 echo
 

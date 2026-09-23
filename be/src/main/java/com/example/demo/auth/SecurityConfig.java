@@ -1,6 +1,7 @@
 package com.example.demo.auth;
 
 import com.example.demo.config.VulnerabilityFlags;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,11 +17,48 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity // attiva @PreAuthorize sui metodi dei controller
 public class SecurityConfig {
+
+    /**
+     * L'origine da cui il frontend ha il permesso di chiamare questa API.
+     * In locale http://localhost:5173, su Render l'indirizzo del sito statico.
+     * E' UNA sola variabile, ALLOWED_ORIGIN: lo stesso nome in application.yml e in render.yaml.
+     */
+    @Value("${app.cors.allowed-origin}")
+    private String allowedOrigin;
+
+    /**
+     * In locale frontend e backend stanno sulla stessa origine, perche' il proxy di Vite
+     * inoltra /api alla 8080: il browser non fa nemmeno partire il controllo CORS.
+     * Su Render invece sono due domini diversi (radici-fe e radici-be), quindi ogni fetch
+     * e' cross-origin: senza questa configurazione il browser blocca la risposta.
+     *
+     * Con Spring Security il CORS va acceso QUI, nella catena dei filtri: i filtri di sicurezza
+     * girano prima di Spring MVC, quindi una @CrossOrigin sul controller arriverebbe troppo tardi
+     * e la richiesta preflight (OPTIONS, senza token) verrebbe respinta prima di essere letta.
+     */
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configurazione = new CorsConfiguration();
+        configurazione.setAllowedOrigins(List.of(allowedOrigin));
+        configurazione.setAllowedMethods(List.of("GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"));
+        configurazione.setAllowedHeaders(List.of("*"));
+        // Serve alla superficie legacy, l'unica che viaggia con un cookie.
+        configurazione.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource sorgente = new UrlBasedCorsConfigurationSource();
+        sorgente.registerCorsConfiguration("/**", configurazione);
+        return sorgente;
+    }
 
     /**
      * CATENA 1 - la superficie "legacy", quella che si autentica con un COOKIE.
@@ -33,6 +71,7 @@ public class SecurityConfig {
             throws Exception {
 
         http.securityMatcher("/api/legacy/**");
+        http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
         http.formLogin(form -> form.disable());
         http.httpBasic(basic -> basic.disable());
         http.sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
@@ -68,6 +107,7 @@ public class SecurityConfig {
      */
     @Bean
     public SecurityFilterChain apiFilterChain(HttpSecurity http, AuthFilter authFilter) throws Exception {
+        http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
         http.formLogin(form -> form.disable());
         http.httpBasic(basic -> basic.disable());
         http.csrf(csrf -> csrf.disable());

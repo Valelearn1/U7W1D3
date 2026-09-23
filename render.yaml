@@ -1,41 +1,63 @@
-# Blueprint Render: database + backend + frontend.
+# Blueprint Render: database + backend + frontend, in un colpo solo.
 # Su Render: New > Blueprint > repository > Apply.
-# Rinominare app-db / app-be / app-fe con il nome del progetto.
+#
+# ATTENZIONE AI NOMI: diventano i domini pubblici (radici-vivaio-be.onrender.com).
+# Vanno scelti PRIMA del primo deploy: cambiarli dopo significa cambiare indirizzo,
+# e quindi rifare ALLOWED_ORIGIN e VITE_API_URL. Se il nome risulta gia' preso su
+# Render, cambiarlo qui in tutte e tre le righe e ricaricare il blueprint.
 
 databases:
-  - name: app-db
-    databaseName: app
-    user: app
+  - name: radici-vivaio-db
+    databaseName: radici
+    user: radici
     plan: free
     region: frankfurt
 
 services:
   # ---------- Backend: Spring Boot via Docker ----------
   - type: web
-    name: app-be
+    name: radici-vivaio-be
     runtime: docker
     plan: free
     region: frankfurt
     rootDir: be
     # dockerfilePath parte da rootDir; buildFilter dalla radice della repo.
     dockerfilePath: ./Dockerfile
+    # Render chiama questo indirizzo finche' non risponde 200: solo allora il deploy
+    # e' "live". Deve restare pubblico (vedi AuthFilter.shouldNotFilter).
     healthCheckPath: /actuator/health
     buildFilter:
       paths:
         - be/**
         - render.yaml
     envVars:
+      # L'indirizzo del database, in formato postgres://. Lo traduce in JDBC la classe
+      # DatabaseUrl, chiamata come prima riga del main.
       - key: DATABASE_URL
         fromDatabase:
-          name: app-db
+          name: radici-vivaio-db
           property: connectionString
-      # Origine del FE per il CORS, es. https://app-fe.onrender.com
+
+      # Chiave di firma dei JWT. generateValue: true -> la genera Render, casuale, e non
+      # compare mai nella repository. Rigenerarla invalida tutti i token gia' emessi.
+      - key: JWT_SECRET
+        generateValue: true
+
+      # Password del primo amministratore (admin@demo.it), creato dal seeder al primo avvio.
+      # sync: false -> la si scrive a mano nel pannello di Render, non sta nel file.
+      # Va impostata PRIMA del primo avvio: dopo, il seeder non rigira piu'.
+      - key: ADMIN_PASSWORD
+        sync: false
+
+      # Origine del frontend, per il CORS. Una sola variabile, lo stesso nome che
+      # SecurityConfig legge da app.cors.allowed-origin.
+      # Valore: https://radici-vivaio-fe.onrender.com (senza / finale).
       - key: ALLOWED_ORIGIN
         sync: false
 
   # ---------- Frontend: build Vite statica ----------
   - type: web
-    name: app-fe
+    name: radici-vivaio-fe
     runtime: static
     rootDir: fe
     buildCommand: npm ci && npm run build
@@ -45,10 +67,13 @@ services:
         - fe/**
         - render.yaml
     envVars:
-      # Indirizzo del BE, es. https://app-be.onrender.com (senza / finale)
+      # Indirizzo del backend, es. https://radici-vivaio-be.onrender.com (senza / finale).
+      # Vite la sostituisce durante la BUILD: cambiarla richiede un nuovo deploy.
       - key: VITE_API_URL
         sync: false
     routes:
+      # Single Page Application: qualunque percorso deve servire index.html,
+      # altrimenti un ricaricamento su una rotta interna darebbe 404.
       - type: rewrite
         source: /*
         destination: /index.html

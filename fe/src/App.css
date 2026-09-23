@@ -1,0 +1,750 @@
+/* ============================================================
+   TEMA "RADICI" — vivaio online
+   Palette: verde salvia, terracotta, crema. Sovrascrive le
+   variabili del template in index.css.
+   ============================================================ */
+:root {
+  --bg: #faf7f0;
+  --text: #5c6b5e;
+  --text-h: #2d3a30;
+  --border: #e6e0d3;
+  --code-bg: #eef1e7;
+  --accent: #4f7d5a;
+  --accent-bg: rgba(79, 125, 90, 0.1);
+  --accent-border: rgba(79, 125, 90, 0.4);
+  --terracotta: #c26b4a;
+  --terracotta-bg: rgba(194, 107, 74, 0.12);
+  --card-shadow: 0 1px 2px rgba(45, 58, 48, 0.06), 0 8px 24px rgba(45, 58, 48, 0.06);
+}
+
+#root {
+  width: 1180px;
+  max-width: 100%;
+  margin: 0 auto;
+  text-align: left;
+  border: none;
+}
+
+.app {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+/* ---------- hero ---------- */
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 20px 24px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(79, 125, 90, 0.14), rgba(194, 107, 74, 0.1));
+  border: 1px solid var(--border);
+}
+.hero-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.hero .logo {
+  font-size: 44px;
+  line-height: 1;
+}
+.hero h1 {
+  font-size: 34px;
+  margin: 0;
+  color: var(--text-h);
+  letter-spacing: -0.5px;
+}
+.tagline {
+  margin: 2px 0 0;
+  color: var(--text);
+  font-size: 14px;
+}
+
+/* ---------- barra utente ---------- */
+.barra-utente {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  flex-wrap: wrap;
+}
+.saluto {
+  color: var(--text);
+}
+.anonimo {
+  color: var(--text);
+  opacity: 0.7;
+}
+.ruolo {
+  background: var(--accent-bg);
+  color: var(--accent);
+  border: 1px solid var(--accent-border);
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* ---------- toolbar (ricerca + categorie) ---------- */
+.toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.ricerca {
+  display: flex;
+  gap: 8px;
+  max-width: 420px;
+}
+.ricerca input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  font-size: 15px;
+  padding: 11px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--text-h);
+}
+.ricerca input:focus {
+  outline: 2px solid var(--accent-border);
+  border-color: var(--accent);
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.chip {
+  background: #fff;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.chip:hover {
+  border-color: var(--accent-border);
+}
+.chip.attivo {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.ricerca-esito {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--text);
+}
+.link {
+  background: transparent;
+  border: none;
+  color: var(--accent);
+  padding: 0;
+  font-size: 14px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* ---------- il mio giardino (preferiti) ---------- */
+.giardino {
+  background: var(--accent-bg);
+  border: 1px solid var(--accent-border);
+  border-radius: 14px;
+  padding: 16px 18px;
+}
+.giardino h2 {
+  margin: 0 0 4px;
+  font-size: 18px;
+  color: var(--text-h);
+}
+.giardino-nota {
+  margin: 0 0 10px;
+  font-size: 13px;
+  color: var(--text);
+  opacity: 0.85;
+}
+.giardino-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.giardino-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 8px 6px 14px;
+  font-size: 14px;
+  color: var(--text-h);
+}
+.giardino-chip .rimuovi {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  line-height: 1;
+  font-size: 16px;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--terracotta);
+  border: 1px solid var(--border);
+}
+
+/* ---------- griglia di card ---------- */
+.griglia {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 18px;
+}
+.card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  display: flex;
+  flex-direction: column;
+}
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--card-shadow);
+  border-color: var(--accent-border);
+}
+.card-cover {
+  position: relative;
+  height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #eef4ec, #e7efe3);
+}
+.cover-emoji {
+  font-size: 64px;
+  line-height: 1;
+}
+.badge-serra {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: var(--terracotta);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+.badge-serra.grande {
+  position: static;
+  display: inline-block;
+  margin-left: 10px;
+  vertical-align: middle;
+  font-size: 12px;
+}
+.fav {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--border);
+  color: #d9a441;
+  font-size: 18px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.fav.attivo {
+  color: #e0a828;
+  border-color: #e0a828;
+}
+.card-body {
+  padding: 14px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.card-cat {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--accent);
+  font-weight: 700;
+}
+.card-body h3 {
+  margin: 2px 0 0;
+  font-size: 16px;
+  color: var(--text-h);
+}
+.specie {
+  color: var(--text);
+  font-size: 13px;
+  margin: 0;
+}
+.card-prezzo {
+  margin-top: 6px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--terracotta);
+}
+
+.vuoto {
+  color: var(--text);
+  opacity: 0.7;
+  padding: 24px 0;
+}
+.vuoto.piccolo {
+  padding: 6px 0;
+  font-size: 14px;
+}
+
+/* ---------- modale dettaglio ---------- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(45, 58, 48, 0.45);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 16px;
+  overflow-y: auto;
+  z-index: 50;
+}
+.modal {
+  position: relative;
+  background: var(--bg);
+  border-radius: 18px;
+  padding: 28px;
+  width: 720px;
+  max-width: 100%;
+  box-shadow: 0 20px 60px rgba(45, 58, 48, 0.3);
+}
+.chiudi {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid var(--border);
+  color: var(--text-h);
+  font-size: 20px;
+  line-height: 1;
+}
+.modal-head {
+  display: flex;
+  gap: 18px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 18px;
+  margin-bottom: 18px;
+}
+.modal-cover {
+  flex: 0 0 120px;
+  height: 120px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #eef4ec, #e7efe3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 64px;
+}
+.modal-head h2 {
+  margin: 4px 0 2px;
+  color: var(--text-h);
+  font-size: 26px;
+}
+.modal-prezzo {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--terracotta);
+  margin: 8px 0 0;
+}
+.stella {
+  margin-top: 12px;
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+}
+.stella.attiva {
+  background: var(--accent-bg);
+  color: #d9a441;
+  border-color: #d9a441;
+}
+
+/* ---------- pannello admin (dati riservati) ---------- */
+.pannello-admin {
+  border: 1px solid rgba(194, 107, 74, 0.4);
+  background: var(--terracotta-bg);
+  border-radius: 12px;
+  padding: 16px;
+  margin: 0 0 18px;
+}
+.pannello-admin h3 {
+  margin: 0 0 12px;
+  font-size: 15px;
+  color: var(--text-h);
+}
+.griglia-admin {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+}
+.griglia-admin .etichetta {
+  display: block;
+  font-size: 12px;
+  color: var(--text);
+  opacity: 0.75;
+  margin-bottom: 2px;
+}
+.griglia-admin strong {
+  color: var(--text-h);
+  font-size: 16px;
+}
+.griglia-admin .margine {
+  color: var(--accent);
+}
+.pannello-admin .pubblica {
+  margin-top: 14px;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+/* ---------- pannello XSS ---------- */
+.pannello-xss {
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin: 0 0 18px;
+  border: 1px solid var(--border);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.pannello-xss.sicuro {
+  border-color: rgba(79, 125, 90, 0.5);
+  background: var(--accent-bg);
+}
+.pannello-xss.pericolo {
+  border-color: rgba(194, 107, 74, 0.6);
+  background: var(--terracotta-bg);
+}
+.pannello-xss p {
+  margin-top: 8px;
+}
+.switch {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  color: var(--text-h);
+  cursor: pointer;
+}
+.switch input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+/* ---------- recensioni ---------- */
+.lista-recensioni {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.recensione {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  background: #fff;
+}
+.recensione-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.recensione-head .voto {
+  color: #d9a441;
+  letter-spacing: 2px;
+}
+.recensione-testo {
+  color: var(--text);
+  word-break: break-word;
+  margin: 0;
+}
+
+/* ---------- form recensione ---------- */
+.form-recensione {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.form-recensione label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-h);
+}
+.form-recensione textarea,
+.form-recensione select {
+  font: inherit;
+  font-size: 15px;
+  font-weight: 400;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text-h);
+  box-sizing: border-box;
+  width: 100%;
+}
+.form-recensione textarea {
+  font-family: var(--mono);
+  resize: vertical;
+}
+.form-riga {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+}
+.form-riga label {
+  flex: 0 0 auto;
+}
+.form-riga button {
+  flex: 1;
+}
+
+/* ---------- Raggi X ---------- */
+.raggi-x {
+  border: 1px solid var(--accent-border);
+  border-radius: 12px;
+  padding: 12px 16px;
+  background: var(--accent-bg);
+}
+.raggi-x summary,
+.hint-sqli summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--text-h);
+}
+.raggi-x-corpo {
+  margin-top: 10px;
+}
+.raggi-x-nota {
+  font-size: 13px;
+  color: var(--text);
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+.raggi-x-nota.piccola {
+  font-size: 12px;
+  opacity: 0.8;
+  margin: 8px 0 0;
+}
+.raggi-x .tag {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  margin-left: 4px;
+}
+.raggi-x .tag.riservati {
+  background: var(--terracotta-bg);
+  color: var(--terracotta);
+}
+.raggi-x .tag.pubblici {
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+.raggi-x-campi {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--accent);
+  margin-bottom: 8px;
+  word-break: break-word;
+}
+.raggi-x pre {
+  background: var(--code-bg);
+  border-radius: 8px;
+  padding: 12px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--text-h);
+  overflow-x: auto;
+  margin: 0;
+}
+
+/* ---------- hint sqli ---------- */
+.hint-sqli {
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 14px;
+}
+.hint-sqli p {
+  margin-top: 8px;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+/* ---------- bottoni generici ---------- */
+button {
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 10px 16px;
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+}
+button:hover {
+  filter: brightness(1.06);
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.barra-utente button {
+  background: #fff;
+  color: var(--text-h);
+  border-color: var(--border);
+  padding: 8px 14px;
+  font-size: 14px;
+}
+.barra-utente button:hover {
+  border-color: var(--accent);
+}
+
+/* ---------- errori ---------- */
+.errore {
+  color: var(--terracotta);
+  font-size: 14px;
+  font-weight: 600;
+}
+.banner {
+  background: var(--terracotta-bg);
+  border: 1px solid rgba(194, 107, 74, 0.4);
+  border-radius: 10px;
+  padding: 12px 16px;
+}
+
+code {
+  font-family: var(--mono);
+  font-size: 0.88em;
+  background: var(--code-bg);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--text-h);
+}
+
+/* ---------- hero azioni + nuova pianta ---------- */
+.hero-azioni {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.nuova {
+  background: var(--terracotta);
+  border-color: var(--terracotta);
+  padding: 9px 16px;
+  font-size: 14px;
+}
+
+/* ---------- modale stretta + form nuova pianta ---------- */
+.modal.stretta {
+  width: 520px;
+}
+.modal.stretta h2 {
+  margin: 0 0 16px;
+  color: var(--text-h);
+  font-size: 22px;
+}
+.form-nuova {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.form-nuova label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-h);
+}
+.form-nuova input {
+  font: inherit;
+  font-size: 15px;
+  font-weight: 400;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--text-h);
+  box-sizing: border-box;
+  width: 100%;
+}
+.form-due {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.form-riservati {
+  border: 1px dashed rgba(194, 107, 74, 0.5);
+  border-radius: 10px;
+  padding: 12px;
+  background: var(--terracotta-bg);
+}
+.etichetta-sezione {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--terracotta);
+}
+.checkbox-riga {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 10px !important;
+  font-weight: 500 !important;
+  font-size: 13px !important;
+}
+.checkbox-riga input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+}

@@ -3,11 +3,11 @@ setlocal
 title Progetto base (locale)
 cd /d "%~dp0"
 
-rem ---------- PostgreSQL: serve il database progetto_base sulla 5432 ----------
+rem ---------- PostgreSQL: serve il database U7W1D2 sulla 5432 ----------
 powershell -NoProfile -Command "$c=New-Object Net.Sockets.TcpClient; try { $c.Connect('localhost',5432); exit 0 } catch { exit 1 }" >nul 2>&1
 if errorlevel 1 (
   echo [postgres] porta 5432 chiusa: il backend non partira'.
-  echo            createdb -U postgres progetto_base
+  echo            createdb -U postgres U7W1D2
 ) else (
   echo [postgres] in ascolto sulla 5432.
 )
@@ -24,6 +24,6 @@ start "FE (5173)" /D "%~dp0fe" cmd /k npm run dev
 
 echo.
 echo  Applicazione : http://localhost:5173
-echo  Stato        : http://localhost:8080/api/stato
+echo  Stato        : http://localhost:8080/api/prodotti
 echo  Salute       : http://localhost:8080/actuator/health
 endlocal

@@ -5,19 +5,31 @@ import com.example.demo.entities.Ruolo;
 import com.example.demo.entities.Utente;
 import com.example.demo.repositories.ProdottoRepository;
 import com.example.demo.repositories.UtenteRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 
-/** Popola il database al primo avvio, cosi' gli agenti trovano qualcosa da interrogare. */
+/**
+ * Popola il database al primo avvio: su Render nessuno si collega a lanciare INSERT a mano,
+ * quindi senza questo il sito pubblicato partirebbe vuoto e senza nessun amministratore.
+ * Gira solo se le tabelle sono vuote, percio' i deploy successivi non duplicano niente.
+ */
 @Component
 public class DataSeeder implements CommandLineRunner {
 
     private final UtenteRepository utenteRepository;
     private final ProdottoRepository prodottoRepository;
     private final PasswordEncoder passwordEncoder;
+
+    /**
+     * La password dell'amministratore non sta nel codice: su Render arriva da ADMIN_PASSWORD,
+     * impostata a mano nel pannello (sync: false). Il ripiego di application.yml vale in aula.
+     */
+    @Value("${app.admin.password}")
+    private String adminPassword;
 
     public DataSeeder(UtenteRepository utenteRepository, ProdottoRepository prodottoRepository,
                       PasswordEncoder passwordEncoder) {
@@ -29,7 +41,7 @@ public class DataSeeder implements CommandLineRunner {
     @Override
     public void run(String... args) {
         if (utenteRepository.count() == 0) {
-            utenteRepository.save(new Utente("admin@demo.it", passwordEncoder.encode("adminadmin"), "Admin", Ruolo.ADMIN));
+            utenteRepository.save(new Utente("admin@demo.it", passwordEncoder.encode(adminPassword), "Admin", Ruolo.ADMIN));
             utenteRepository.save(new Utente("user@demo.it", passwordEncoder.encode("useruser12"), "Utente Normale", Ruolo.USER));
             // Secondo utente normale: serve alla demo IDOR (un utente prova a toccare i preferiti dell'altro).
             utenteRepository.save(new Utente("altro@demo.it", passwordEncoder.encode("useruser12"), "Altro Utente", Ruolo.USER));
