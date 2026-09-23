@@ -465,6 +465,8 @@ function ModaleNuovaPianta({ categorie, onCrea, onChiudi }) {
 
 function BarraUtente({ utente, onLogin, onLogout }) {
   const [errore, setErrore] = useState(null)
+  const [mostraFormAdmin, setMostraFormAdmin] = useState(false)
+  const [passwordAdmin, setPasswordAdmin] = useState('')
 
   async function login(email, password) {
     setErrore(null)
@@ -492,8 +494,39 @@ function BarraUtente({ utente, onLogin, onLogout }) {
   return (
     <div className="barra-utente">
       <span className="anonimo">Anonimo</span>
+
+      {/* L'utente normale e' un account dimostrativo: la sua password e' pubblica per
+          costruzione, serve solo a far vedere il livello 3 (ognuno vede i propri preferiti).
+          Tenerla qui non espone niente che non sia gia' scritto nel README. */}
       <button onClick={() => login('user@demo.it', 'useruser12')}>Entra come USER</button>
-      <button onClick={() => login('admin@demo.it', 'adminadmin')}>Entra come ADMIN</button>
+
+      {/* L'admin no: la sua password e' ADMIN_PASSWORD, scelta al momento del deploy e
+          diversa su ogni installazione. Scriverla qui significherebbe pubblicarla, visto
+          che il bundle del frontend e' scaricabile da chiunque apra il sito. Si digita. */}
+      {mostraFormAdmin ? (
+        <form
+          className="login-admin"
+          onSubmit={(e) => {
+            e.preventDefault()
+            login('admin@demo.it', passwordAdmin)
+          }}
+        >
+          <input
+            type="password"
+            value={passwordAdmin}
+            onChange={(e) => setPasswordAdmin(e.target.value)}
+            placeholder="Password admin"
+            autoFocus
+          />
+          <button type="submit">Entra</button>
+          <button type="button" className="annulla" onClick={() => setMostraFormAdmin(false)}>
+            Annulla
+          </button>
+        </form>
+      ) : (
+        <button onClick={() => setMostraFormAdmin(true)}>Entra come ADMIN</button>
+      )}
+
       {errore && <span className="errore">⚠️ {errore}</span>}
     </div>
   )

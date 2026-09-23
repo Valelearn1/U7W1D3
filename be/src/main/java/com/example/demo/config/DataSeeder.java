@@ -40,6 +40,8 @@ public class DataSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
+        allineaPasswordAdmin();
+
         if (utenteRepository.count() == 0) {
             utenteRepository.save(new Utente("admin@demo.it", passwordEncoder.encode(adminPassword), "Admin", Ruolo.ADMIN));
             utenteRepository.save(new Utente("user@demo.it", passwordEncoder.encode("useruser12"), "Utente Normale", Ruolo.USER));
@@ -75,5 +77,28 @@ public class DataSeeder implements CommandLineRunner {
             prodottoRepository.save(new Prodotto("Dionaea (pianta carnivora)", "Preordine, in germinazione", new BigDecimal("16.90"), "Da interno", false, new BigDecimal("8.00"), "OrtoBio"));
             System.out.println(">> Catalogo di test creato: 19 piante (16 pubblicate + 3 in serra)");
         }
+    }
+
+    /**
+     * Riallinea la password dell'admin ad ADMIN_PASSWORD a ogni avvio.
+     *
+     * Senza questo, la password verrebbe fissata una volta sola, alla creazione dell'utente:
+     * cambiare la variabile su Render non avrebbe alcun effetto, perche' nel database resta
+     * l'hash di prima, e l'unico modo per rientrare sarebbe cancellare la riga a mano.
+     * Cosi' invece la variabile d'ambiente comanda sempre: si corregge il valore, si rilancia
+     * il servizio, e la password e' quella nuova.
+     *
+     * Il confronto con matches() evita di riscrivere la riga quando non e' cambiato niente:
+     * BCrypt usa un salt diverso a ogni encode, quindi confrontare gli hash direttamente
+     * darebbe sempre "diversi" e faremmo una UPDATE inutile a ogni riavvio.
+     */
+    private void allineaPasswordAdmin() {
+        utenteRepository.findByEmail("admin@demo.it").ifPresent(admin -> {
+            if (!passwordEncoder.matches(adminPassword, admin.getPassword())) {
+                admin.setPassword(passwordEncoder.encode(adminPassword));
+                utenteRepository.save(admin);
+                System.out.println(">> Password dell'admin riallineata ad ADMIN_PASSWORD");
+            }
+        });
     }
 }

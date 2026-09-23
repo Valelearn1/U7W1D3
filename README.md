@@ -65,8 +65,11 @@ Tre punti dove i due pezzi si incontrano:
 3. http://localhost:5173 — in sviluppo il proxy di Vite inoltra `/api` alla 8080,
    quindi `VITE_API_URL` resta vuota.
 
-Utenti creati al primo avvio: `admin@demo.it`, `user@demo.it`, `altro@demo.it`
-(password degli utenti normali: `useruser12`; quella dell'admin è `ADMIN_PASSWORD`).
+Utenti creati al primo avvio: `admin@demo.it`, `user@demo.it`, `altro@demo.it`.
+Gli utenti normali entrano con un pulsante (password `useruser12`, dimostrativa); per l'admin
+si digita `ADMIN_PASSWORD`, che non puo' stare nel codice perche' il bundle del frontend e'
+scaricabile da chiunque. Il seeder la riallinea a ogni avvio: per cambiarla basta
+modificare la variabile e rilanciare il servizio.
 
 ## Deploy su Render
 
@@ -83,7 +86,7 @@ il database, il backend Docker e il sito statico.
 
 | Servizio | Variabile | Valore | Quando |
 |---|---|---|---|
-| backend | `ADMIN_PASSWORD` | la password che si vuole per `admin@demo.it` | **prima del primo avvio**: il seeder gira una volta sola |
+| backend | `ADMIN_PASSWORD` | la password che si vuole per `admin@demo.it` | anche dopo: il seeder la riallinea a ogni avvio |
 | backend | `ALLOWED_ORIGIN` | `https://radici-vivaio-fe.onrender.com` | dopo la prima build |
 | frontend | `VITE_API_URL` | `https://radici-vivaio-be.onrender.com` | dopo la prima build |
 
