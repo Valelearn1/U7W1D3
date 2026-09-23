@@ -431,40 +431,6 @@
   border-color: var(--accent);
 }
 
-/* ---------- pannello XSS ---------- */
-.pannello-xss {
-  border-radius: 12px;
-  padding: 14px 16px;
-  margin: 0 0 18px;
-  border: 1px solid var(--border);
-  font-size: 14px;
-  line-height: 1.5;
-}
-.pannello-xss.sicuro {
-  border-color: rgba(79, 125, 90, 0.5);
-  background: var(--accent-bg);
-}
-.pannello-xss.pericolo {
-  border-color: rgba(194, 107, 74, 0.6);
-  background: var(--terracotta-bg);
-}
-.pannello-xss p {
-  margin-top: 8px;
-}
-.switch {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: 600;
-  color: var(--text-h);
-  cursor: pointer;
-}
-.switch input {
-  width: 18px;
-  height: 18px;
-  accent-color: var(--accent);
-  cursor: pointer;
-}
 
 /* ---------- recensioni ---------- */
 .lista-recensioni {
@@ -544,80 +510,6 @@
   flex: 1;
 }
 
-/* ---------- Raggi X ---------- */
-.raggi-x {
-  border: 1px solid var(--accent-border);
-  border-radius: 12px;
-  padding: 12px 16px;
-  background: var(--accent-bg);
-}
-.raggi-x summary,
-.hint-sqli summary {
-  cursor: pointer;
-  font-weight: 600;
-  color: var(--text-h);
-}
-.raggi-x-corpo {
-  margin-top: 10px;
-}
-.raggi-x-nota {
-  font-size: 13px;
-  color: var(--text);
-  margin-bottom: 8px;
-  line-height: 1.5;
-}
-.raggi-x-nota.piccola {
-  font-size: 12px;
-  opacity: 0.8;
-  margin: 8px 0 0;
-}
-.raggi-x .tag {
-  display: inline-block;
-  padding: 1px 8px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 700;
-  margin-left: 4px;
-}
-.raggi-x .tag.riservati {
-  background: var(--terracotta-bg);
-  color: var(--terracotta);
-}
-.raggi-x .tag.pubblici {
-  background: var(--accent-bg);
-  color: var(--accent);
-}
-.raggi-x-campi {
-  font-family: var(--mono);
-  font-size: 12px;
-  color: var(--accent);
-  margin-bottom: 8px;
-  word-break: break-word;
-}
-.raggi-x pre {
-  background: var(--code-bg);
-  border-radius: 8px;
-  padding: 12px;
-  font-family: var(--mono);
-  font-size: 12.5px;
-  line-height: 1.5;
-  color: var(--text-h);
-  overflow-x: auto;
-  margin: 0;
-}
-
-/* ---------- hint sqli ---------- */
-.hint-sqli {
-  border: 1px dashed var(--border);
-  border-radius: 12px;
-  padding: 12px 16px;
-  font-size: 14px;
-}
-.hint-sqli p {
-  margin-top: 8px;
-  line-height: 1.5;
-  color: var(--text);
-}
 
 /* ---------- bottoni generici ---------- */
 button {

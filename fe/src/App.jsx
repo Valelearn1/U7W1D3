@@ -27,9 +27,6 @@ export default function App() {
   const [categoria, setCategoria] = useState(null)
   const [mostraNuova, setMostraNuova] = useState(false)
 
-  // Interruttore didattico del FRONTEND per la dimostrazione XSS (vedi PannelloXss).
-  const [renderVulnerabile, setRenderVulnerabile] = useState(false)
-
   const isAdmin = utente?.ruolo === 'ADMIN'
 
   useEffect(() => {
@@ -48,7 +45,6 @@ export default function App() {
 
   function chiudiModale() {
     setSelezionato(null)
-    setRenderVulnerabile(false)
   }
 
   async function eseguiRicerca(e) {
@@ -132,8 +128,7 @@ export default function App() {
 
       {erroreGlobale && (
         <p className="errore banner">
-          Vivaio non raggiungibile ({erroreGlobale}). Avvia l'API su :3001 con{' '}
-          <code>./mvnw spring-boot:run</code>.
+          Vivaio non raggiungibile al momento. Riprova tra qualche istante.
         </p>
       )}
 
@@ -194,17 +189,6 @@ export default function App() {
         {daMostrare.length === 0 && <p className="vuoto">Nessuna pianta trovata.</p>}
       </main>
 
-      <RaggiX dati={daMostrare} ruolo={utente?.ruolo} />
-
-      <details className="hint-sqli">
-        <summary>💉 Per la demo: prova la SQL Injection</summary>
-        <p>
-          Con il flag <code>app.vulnerable.sqli</code> attivo, cerca <code>%' OR '1'='1</code>:
-          invece delle piante che corrispondono torna <strong>l'intero catalogo</strong>. La tua
-          stringa è finita dentro la query SQL.
-        </p>
-      </details>
-
       {mostraNuova && (
         <ModaleNuovaPianta
           categorie={categorie}
@@ -220,8 +204,6 @@ export default function App() {
           utente={utente}
           isAdmin={isAdmin}
           preferito={!!preferitoDi(selezionato.id)}
-          renderVulnerabile={renderVulnerabile}
-          onToggleXss={() => setRenderVulnerabile((v) => !v)}
           onToggleFav={() => togglePreferito(selezionato)}
           onPubblica={() => pubblica(selezionato)}
           onInviaRecensione={async (testo, voto) => {
@@ -292,8 +274,8 @@ function IlMioGiardino({ preferiti, onRimuovi }) {
 }
 
 function ModaleProdotto({
-  prodotto, recensioni, utente, isAdmin, preferito, renderVulnerabile,
-  onToggleXss, onToggleFav, onPubblica, onInviaRecensione, onChiudi,
+  prodotto, recensioni, utente, isAdmin, preferito,
+  onToggleFav, onPubblica, onInviaRecensione, onChiudi,
 }) {
   const bozza = prodotto.pubblicato === false
   return (
@@ -354,15 +336,13 @@ function ModaleProdotto({
           </div>
         )}
 
-        <PannelloXss attivo={renderVulnerabile} onToggle={onToggleXss} />
-
         <h3>Recensioni ({recensioni.length})</h3>
         {recensioni.length === 0 ? (
           <p className="vuoto">Ancora nessuna recensione.</p>
         ) : (
           <ul className="lista-recensioni">
             {recensioni.map((r) => (
-              <Recensione key={r.id} recensione={r} modalitaVulnerabile={renderVulnerabile} />
+              <Recensione key={r.id} recensione={r} />
             ))}
           </ul>
         )}
@@ -528,61 +508,6 @@ function BarraUtente({ utente, onLogin, onLogout }) {
       )}
 
       {errore && <span className="errore">⚠️ {errore}</span>}
-    </div>
-  )
-}
-
-// L'IDEA INNOVATIVA: mostra il JSON reale che il server ha risposto per il ruolo corrente.
-function RaggiX({ dati, ruolo }) {
-  const primo = dati[0]
-  const campi = primo ? Object.keys(primo) : []
-  const haRiservati = campi.includes('prezzoAcquisto')
-
-  return (
-    <details className="raggi-x">
-      <summary>🔬 Raggi X — cosa risponde il server</summary>
-      <div className="raggi-x-corpo">
-        <p className="raggi-x-nota">
-          Ruolo attuale: <strong>{ruolo || 'Anonimo'}</strong> · piante ricevute:{' '}
-          <strong>{dati.length}</strong> · campi per pianta: <strong>{campi.length}</strong>
-          {haRiservati ? (
-            <span className="tag riservati"> include campi riservati</span>
-          ) : (
-            <span className="tag pubblici"> solo campi pubblici</span>
-          )}
-        </p>
-        <p className="raggi-x-campi">{campi.join(' · ') || '—'}</p>
-        <pre>{JSON.stringify(primo ?? {}, null, 2)}</pre>
-        <p className="raggi-x-nota piccola">
-          È la prima pianta così come è arrivata dal server. I campi assenti non sono nascosti
-          dalla pagina: il server non li ha proprio inviati.
-        </p>
-      </div>
-    </details>
-  )
-}
-
-function PannelloXss({ attivo, onToggle }) {
-  return (
-    <div className={`pannello-xss ${attivo ? 'pericolo' : 'sicuro'}`}>
-      <label className="switch">
-        <input type="checkbox" checked={attivo} onChange={onToggle} />
-        <span>Rendering vulnerabile (dangerouslySetInnerHTML)</span>
-      </label>
-      <p>
-        {attivo ? (
-          <>
-            🔴 <strong>Porta aperta.</strong> Le recensioni vengono iniettate come HTML grezzo. Se
-            una contiene <code>&lt;img onerror&gt;</code> o <code>&lt;script&gt;</code> e il backend
-            non l'ha sanitizzata, il codice <strong>parte davvero</strong>.
-          </>
-        ) : (
-          <>
-            🟢 <strong>Porta chiusa.</strong> React escapa il testo: qualsiasi markup viene mostrato
-            come semplici caratteri, non eseguito. È il comportamento di default.
-          </>
-        )}
-      </p>
     </div>
   )
 }

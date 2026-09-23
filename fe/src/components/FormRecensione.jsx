@@ -1,10 +1,9 @@
 import { useState } from 'react'
 
-// Form per aggiungere una recensione. Richiede di essere loggati (il token viene
-// aggiunto dall'api client). Precompilato con un payload XSS d'esempio, cosi' la
-// dimostrazione parte con un click.
+// Form per aggiungere una recensione. Richiede di essere loggati (il token lo
+// aggiunge lib/api.js).
 export default function FormRecensione({ onInvia, disabilitato }) {
-  const [testo, setTesto] = useState("<img src=x onerror=\"alert('XSS!')\">")
+  const [testo, setTesto] = useState('')
   const [voto, setVoto] = useState(5)
   const [errore, setErrore] = useState(null)
 
@@ -27,7 +26,7 @@ export default function FormRecensione({ onInvia, disabilitato }) {
           value={testo}
           onChange={(e) => setTesto(e.target.value)}
           rows={2}
-          placeholder="Scrivi qui... prova anche con <script> o <img onerror>"
+          placeholder="Com'è andata con questa pianta?"
           required
         />
       </label>
