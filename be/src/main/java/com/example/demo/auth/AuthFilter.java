@@ -143,6 +143,9 @@ public class AuthFilter extends OncePerRequestFilter {
         String path = request.getServletPath();
         return MATCHER.match("/api/auth/**", path)
                 || MATCHER.match("/actuator/**", path)
-                || MATCHER.match("/error", path);
+                || MATCHER.match("/error", path)
+                // La radice: chi apre l'indirizzo del backend nel browser si aspetta una
+                // pagina, non un 401 che gli chiede un token che non ha modo di avere.
+                || "/".equals(path);
     }
 }
